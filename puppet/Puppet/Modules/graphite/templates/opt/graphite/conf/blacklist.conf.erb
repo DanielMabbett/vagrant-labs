@@ -1,0 +1,10 @@
+<%
+  blacklist = scope.lookupvar('graphite::gr_blacklist')
+  if blacklist
+-%>
+<%=
+blacklist.join("\n")
+%>
+<%
+  end
+-%>

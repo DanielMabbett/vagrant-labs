@@ -1,0 +1,4 @@
+.vagrant/
+.vagrant/*
+puppet/Puppet/Modules/graphite/templates/etc/apache2/sites-available/graphite.conf.erb
+windows/workspace/content/2012R2WMF5.0PowerShellDSC.msu

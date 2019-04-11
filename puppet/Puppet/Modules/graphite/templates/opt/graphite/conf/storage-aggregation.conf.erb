@@ -1,0 +1,8 @@
+<%
+  rules = scope.lookupvar('graphite::gr_storage_aggregation_rules')
+  rules.sort.each do |name, rule| %>
+[<%= name %>]
+<%- if rule['pattern'] then %>pattern = <%= rule['pattern'] %><% end %>
+<%- if rule['factor'] then %>xFilesFactor = <%= rule['factor'] %><% end %>
+<%- if rule['method'] then %>aggregationMethod = <%= rule['method'] %><% end %>
+<% end %>

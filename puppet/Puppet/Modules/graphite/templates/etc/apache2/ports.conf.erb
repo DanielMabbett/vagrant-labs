@@ -1,0 +1,10 @@
+NameVirtualHost *:<%= scope.lookupvar('graphite::gr_apache_port') %>
+Listen <%= scope.lookupvar('graphite::gr_apache_port') %>
+
+<IfModule mod_ssl.c>
+    Listen <%= scope.lookupvar('graphite::gr_apache_port_https') %>
+</IfModule>
+
+<IfModule mod_gnutls.c>
+    Listen <%= scope.lookupvar('graphite::gr_apache_port_https') %>
+</IfModule>

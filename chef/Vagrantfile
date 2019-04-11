@@ -1,0 +1,57 @@
+#-------------------------------------------------------------------------------------#
+# File:        VagrantFile-VirtualMachineGeneration
+# Author:      EUD Build Engineer
+# Version:     0.1
+# Date:        31/08/16
+# Description: Declares the VM parameters for the chefserver and Agent nodes.
+#-------------------------------------------------------------------------------------#
+
+Vagrant.configure(2) do |config|
+
+##-------------------------------{chefserver Node}----------------------------------------------------#
+
+ #sets base box Ubuntu for Puppet chefserver NOTE: the box's default Hard Disk size = 40Gb
+  config.vm.define "chefserver" do |chefserver|
+    chefserver.vm.box = "chad-thompson/ubuntu-trusty64-gui"
+    chefserver.vm.network "public_network", bridge: "en0: Wi-Fi (AirPort)", ip: "10.0.0.1"
+    chefserver.vm.hostname = "chefserver.contoso.com"
+    chefserver.vm.provider :virtualbox do |chefserver|
+        chefserver.memory = 2048
+        chefserver.name   = "chefserver"
+        chefserver.gui    = true
+        chefserver.customize ["modifyvm", :id, "--clipboard", "bidirectional"]
+        chefserver.customize ["modifyvm", :id, "--draganddrop", "bidirectional"]
+    end
+
+#Bootstraps the Machine with shells to complete    
+    chefserver.vm.provision :shell, path: "Bootstrap.sh" # Initialise Bootstrap
+    #chefserver.vm.provision :shell, path: "bs-install-chef-server.sh" # Install chef server
+    chefserver.vm.provision :shell, path: "bs-Install-vim.sh" # Install vim
+    chefserver.vm.provision :shell, path: "bs-Configure-Hosts.sh" # Etches into the Hosts file
+
+  end
+
+##-------------------------------{Agent 1 Node}----------------------------------------------------#
+
+# sets base box Ubuntu for first Agent
+ config.vm.define "chefworkstation" do |chefworkstation|
+   chefworkstation.vm.box = "chad-thompson/ubuntu-trusty64-gui"
+   chefworkstation.vm.network "public_network", bridge: "en0: Wi-Fi (AirPort)", ip: "10.0.0.2"
+   chefworkstation.vm.hostname = "chefworkstation.contoso.com"
+   chefworkstation.vm.provider :virtualbox do |c2|
+     c2.memory = 1024
+     c2.name   = "chefworkstation"
+     c2.gui    = true
+     c2.customize ["modifyvm", :id, "--clipboard", "bidirectional"]
+     c2.customize ["modifyvm", :id, "--draganddrop", "bidirectional"]
+   end
+
+#Bootstraps the Machine with shells to complete       
+   chefworkstation.vm.provision :shell, path: "Bootstrap.sh" # Initial Bootstrap
+   chefworkstation.vm.provision :shell, path: "bs-install-vim.sh" # Initial Bootstrap
+   chefworkstation.vm.provision :shell, path: "bs-Configure-Hosts.sh" # Etches into the Hosts file 
+   #chefworkstation.vm.provision :shell, path: "Bootstrap_agent_1_ipconfig.sh"     # sets chefserver and current agent FQDN's, hostnames and IP's
+
+ end
+
+end

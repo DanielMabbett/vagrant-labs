@@ -1,0 +1,45 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+# Author: Daniel Mabbett
+
+Vagrant.configure(2) do |config|
+
+# ------------------------------[puppetmaster]------------------------------------------- #
+
+config.vm.define "vm01" do |vm01|
+  vm01.vm.box = "ubuntu/xenial64"
+  vm01.vm.network "public_network", bridge: "en0: Wi-Fi (AirPort)", ip: "10.0.0.1"
+  vm01.vm.hostname = "vm01.contoso.com"
+  vm01.vm.provider :virtualbox do |vm01|
+      vm01.memory = "2048"
+      vm01.name   = "vm01"
+      vm01.gui    = true
+      vm01.customize ["modifyvm", :id, "--clipboard", "bidirectional"]
+      vm01.customize ["modifyvm", :id, "--draganddrop", "bidirectional"]
+  end
+  # Provisioning 
+  vm01.vm.provision :shell, path: 'shell/cfg-install-omi.sh' # Initialise Bootstrap
+end
+
+# ------------------------------[puppetagent-windows]------------------------------------------- #
+config.vm.define "vm02" do |vm02|
+  vm02.vm.box = "opentable/win-2012r2-standard-amd64-nocm"
+  vm02.vm.box_check_update = false
+  vm02.vm.network "public_network", bridge: "en0: Wi-Fi (AirPort)", ip: "10.0.0.2"
+  vm02.vm.hostname = "vm02"
+  vm02.vm.provider "virtualbox" do |vm02|
+    vm02.name   = "vm02"   
+    vm02.gui    = true      
+    vm02.memory = "1024"
+    vm02.customize ["modifyvm", :id, "--vram", "18"]
+    vm02.customize ["modifyvm", :id, "--clipboard", "bidirectional"]
+    vm02.customize ["modifyvm", :id, "--draganddrop", "bidirectional"]
+  end
+  # Provisioning 
+  vm02.vm.provision "shell", path: 'scripts/cfg-new-scriptsdirectory.ps1'
+  vm02.vm.provision "shell", path: 'scripts/cfg-new-contentdirectory.ps1'
+  vm02.vm.provision "shell", path: 'scripts/cfg-download-wmf5.ps1'
+  vm02.vm.provision "file", source: 'scripts/configure-dc01.ps1', destination: 'c:/scripts'
+end
+# ------------------------------[End]------------------------------------------- #
+end

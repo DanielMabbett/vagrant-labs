@@ -1,0 +1,97 @@
+#-------------------------------------------------------------------------------------#
+# File:        VagrantFile-VirtualMachineGeneration
+# Author:      EUD Build Engineer
+# Version:     0.1
+# Date:        31/08/16
+# Description: Declares the VM parameters for the Master and Agent nodes.
+#-------------------------------------------------------------------------------------#
+
+Vagrant.configure(2) do |config|
+
+##-------------------------------{Master Node}----------------------------------------------------#
+
+ #sets base box Ubuntu for Puppet Master NOTE: the box's default Hard Disk size = 40Gb
+  config.vm.define "node_1_master" do |node_1_master|
+    node_1_master.vm.box = "chad-thompson/ubuntu-trusty64-gui"
+    #node_1_master.vm.network "public_network", ip: "10.0.0.1"
+    node_1_master.vm.network "public_network", bridge: "en0: Wi-Fi (AirPort)", ip: "10.0.0.1"
+    node_1_master.vm.hostname = "corp.contoso.com"
+    node_1_master.vm.provider :virtualbox do |master|
+        master.memory = 2048
+        master.name   = "Master"
+        master.gui    = true
+        master.customize ["modifyvm", :id, "--clipboard", "bidirectional"]
+        master.customize ["modifyvm", :id, "--draganddrop", "bidirectional"]
+    end
+
+#Bootstraps the Machine with shells to complete    
+    node_1_master.vm.provision :shell, path: "Bootstrap.sh" # Initialise Bootstrap
+    node_1_master.vm.provision :shell, path: "bs-Install-Ansible.sh" # Install Ansible
+    node_1_master.vm.provision :shell, path: "bs-Install-vim.sh" # Install vim
+    node_1_master.vm.provision :shell, path: "bs-Configure-HostsForMaster.sh" # Etches into the Hosts file    
+        
+  end
+
+##-------------------------------{Agent 1 Node}----------------------------------------------------#
+
+# sets base box Ubuntu for first Agent
+ config.vm.define "node_2" do |node_2|
+   node_2.vm.box = "chad-thompson/ubuntu-trusty64-gui"
+   node_2.vm.network "public_network", bridge: "en0: Wi-Fi (AirPort)", ip: "10.0.0.2"
+   #config.vm.network "public_network", bridge: "Intel(R) 82579LM Gigabit Network Connection"
+   node_2.vm.hostname = "agent1.contoso.com"
+   node_2.vm.provider :virtualbox do |c2|
+     c2.memory = 1024
+     c2.name   = "Agent1"
+     c2.gui    = true
+   end
+
+#Bootstraps the Machine with shells to complete       
+   node_2.vm.provision :shell, path: "Bootstrap.sh" # Initial Bootstrap
+   node_2.vm.provision :shell, path: "bs-install-vim.sh" # Initial Bootstrap
+   #node_2.vm.provision :shell, path: "Bootstrap_agent_1_ipconfig.sh"     # sets master and current agent FQDN's, hostnames and IP's
+
+ end
+#-------------------------------{Agent 2 Node}----------------------------------------------------#
+
+# sets base box CentOS for second Agent
+ config.vm.define "node_3" do |node_3|
+   node_3.vm.box = "chad-thompson/ubuntu-trusty64-gui" 
+   #node_3.vm.network "public_network", ip: "10.0.0.3"
+   node_3.vm.network "public_network", bridge: "en0: Wi-Fi (AirPort)", ip: "10.0.0.3"
+   node_3.vm.hostname = "agent2.contoso.com"    
+   node_3.vm.provider :virtualbox do |c3|
+       c3.memory = 1024
+       c3.name   = "Agent2"
+       c3.gui    = true
+   end
+
+#Bootstraps the Machine with shells to complete    
+   node_3.vm.provision :shell, path: "Bootstrap.sh" # Initial Bootstrap
+   node_3.vm.provision :shell, path: "bs-install-vim.sh" # Initial Bootstrap
+   #node_3.vm.provision :shell, path: "centOSBash_agent_2_ipconfig.sh" # sets master and current ent FQDN's, hostnames and IP's
+
+ end
+#-------------------------------{Agent 3 Node}----------------------------------------------------#
+
+# sets base box Ubuntu for third Agent
+ config.vm.define "node_4" do |node_4|
+   node_4.vm.box = "chad-thompson/ubuntu-trusty64-gui"
+   #node_4.vm.network "public_network", ip: "10.0.0.4"
+   node_4.vm.network "public_network", bridge: "en0: Wi-Fi (AirPort)", ip: "10.0.0.4"
+
+   node_4.vm.hostname = "agent3.contoso.com"
+   node_4.vm.provider :virtualbox do |c4|
+       c4.memory = 1024
+       c4.name   = "Agent3"
+       c4.gui    = true
+   end
+   
+   node_4.vm.provision :shell, path: "Bootstrap.sh" # Initial Bootstrap
+   node_4.vm.provision :shell, path: "bs-install-vim.sh" # Initial Bootstrap
+
+
+  end
+
+#--------------------------------------------------------------------------------------------------#
+end
